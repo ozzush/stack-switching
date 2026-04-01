@@ -1281,7 +1281,9 @@ let rec step (c : config) : config =
         vs', [Frame (n2, frame', ([], instr')) @@ e.at]
 
       | Func.HostFunc (_, f) ->
-        (try List.rev (f (List.rev args)) @ vs', []
+        let prom = Lib.Promise.make () in
+        Lib.Promise.fulfill prom c.frame.inst;
+        (try List.rev (f prom (List.rev args)) @ vs', []
         with Crash (_, msg) -> Crash.error e.at msg)
       )
 
